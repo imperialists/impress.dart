@@ -1,5 +1,8 @@
 #import('dart:html');
 
+/**
+ * Throttling function calls
+ */
 throttle(fn, int delay) {
   int handle = 0;
   return (args) {
@@ -9,14 +12,6 @@ throttle(fn, int delay) {
 }
 
 main() {
-  // throttling function calls
-  var throttle = (fn, delay) {
-    int timer = 0;
-    return () => {
-      fn(context, args);
-    }
-  };
-
   document.on.change.add((event) {
     var api = event.detail.api;
   });
@@ -26,7 +21,7 @@ main() {
     if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40)) {
       event.preventDefault();
     }
-  })
+  });
 
   // trigger impress action (next or prev) on keyup
   document.on.keyUp.add((event) {
