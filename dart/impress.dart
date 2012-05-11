@@ -1,5 +1,8 @@
 #import('dart:html');
 
+/**
+ * Throttling function calls
+ */
 throttle(fn, int delay) {
   int handle = 0;
   return (args) {
@@ -8,25 +11,29 @@ throttle(fn, int delay) {
   };
 }
 
-main() {
-  // throttling function calls
-  var throttle = (fn, delay) {
-    int timer = 0;
-    return () => {
-      fn(context, args);
-    }
-  };
+class impress {
+  Element goto(target, [duration=0]) {
+    return null;
+  }
+  
+  Element prev() {
+    return null;
+  }
+  
+  Element next() {
+    return null;
+  }
+}
 
-  document.on.change.add((event) {
-    var api = event.detail.api;
-  });
-
+void main() {
+  impress api = new impress();
+  
   // prevent default keydown action when one of supported key is pressed
   document.on.keyDown.add((event) {
     if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40)) {
       event.preventDefault();
     }
-  })
+  });
 
   // trigger impress action (next or prev) on keyup
   document.on.keyUp.add((event) {
@@ -68,7 +75,7 @@ main() {
       }
     }
 
-    if (api.goto(target)) {
+    if (api.goto(target) != null) {
       event.stopImmediatePropagation();
       event.preventDefault();
     }
@@ -82,7 +89,7 @@ main() {
             (target !== document.documentElement))) {
       target = target.parentNode;
     }
-    if (api.goto(target)) {
+    if (api.goto(target) != null) {
       event.preventDefault();
     }
   });
