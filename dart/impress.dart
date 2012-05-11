@@ -11,11 +11,23 @@ throttle(fn, int delay) {
   };
 }
 
-main() {
-  document.on.change.add((event) {
-    var api = event.detail.api;
-  });
+class impress {
+  Element goto(target, [duration=0]) {
+    return null;
+  }
+  
+  Element prev() {
+    return null;
+  }
+  
+  Element next() {
+    return null;
+  }
+}
 
+void main() {
+  impress api = new impress();
+  
   // prevent default keydown action when one of supported key is pressed
   document.on.keyDown.add((event) {
     if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40)) {
@@ -63,7 +75,7 @@ main() {
       }
     }
 
-    if (api.goto(target)) {
+    if (api.goto(target) != null) {
       event.stopImmediatePropagation();
       event.preventDefault();
     }
@@ -77,7 +89,7 @@ main() {
             (target !== document.documentElement))) {
       target = target.parentNode;
     }
-    if (api.goto(target)) {
+    if (api.goto(target) != null) {
       event.preventDefault();
     }
   });
