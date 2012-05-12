@@ -5,37 +5,59 @@
 body { background:#EBEBEB; font:16px/24px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; color:#333; }
 .step { width:940px; margin:0 auto 24px auto; text-align:center; }
 
-
-
-#its-in-3d .middlefront {
-    -webkit-transform: translateZ(20px);
-    -moz-transform:    translateZ(20px);
-    -ms-transform:     translateZ(20px);
-    -o-transform:      translateZ(20px);
-    transform:         translateZ(20px);
+.ball2 {
+	background-color: rgba(0,0,0,0);
+	border:20px solid rgba(0,183,129,0.4);
+	opacity:.95;
+	border-top:5px solid rgba(0,0,0,0);
+	border-left:5px solid rgba(0,0,0,0);
+	border-radius:500px;
+	box-shadow: 70 0 30px #2187e7; 
+	width:500px;
+	height:500px;
+	margin:0 auto;
+	position:absolute;
+	top:-400px;
+	left:300px;
+	-moz-animation:spinoff 9s infinite linear;
+	-webkit-animation:spinoff 9s infinite linear;
+	opacity: 20;
 }
-
-#its-in-3d .back {
-    -webkit-transform: translateZ(-40px);
-    -moz-transform:    translateZ(-40px);
-    -ms-transform:     translateZ(-40px);
-    -o-transform:      translateZ(-40px);
-    transform:         translateZ(-40px);
+.ball1 {
+	background-color: rgba(0,0,0,0);
+	border:20px solid rgba(0,183,229,0.5);
+	opacity:.95;
+	border-top:5px solid rgba(0,0,0,0);
+	border-left:5px solid rgba(0,0,0,0);
+	border-radius:700px;
+	box-shadow: 30 0 70px #2187e7; 
+	width:700px;
+	height:700px;
+	margin:0 auto;
+	position:absolute;
+	top:-200px;
+	-moz-animation:spinoff 10s infinite linear;
+	-webkit-animation:spinoff 10s infinite linear;
+	opacity: 20;
 }
-
-#its-in-3d .front {
-    -webkit-transform: translateZ(60px);
-    -moz-transform:    translateZ(60px);
-    -ms-transform:     translateZ(60px);
-    -o-transform:      translateZ(60px);
-    transform:         translateZ(60px);
+.googleDart {
+	-moz-animation:spin 10s infinite linear;
+	-webkit-animation:spin 10s infinite linear;
+	opacity: 30;
 }
-
-#its-in-3d .middleback {
-    -webkit-transform: translateZ(-10px);
-    -moz-transform:    translateZ(-10px);
-    -ms-transform:     translateZ(-10px);
-    -o-transform:      translateZ(-10px);
-    transform:         translateZ(-10px);
+@-moz-keyframes spin {
+	0% { -moz-transform:rotate(0deg); }
+	100% { -moz-transform:rotate(360deg); }
 }
-
+@-webkit-keyframes spin {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(360deg); }
+}
+@-moz-keyframes spinoff {
+	0% { -moz-transform:rotate(0deg); }
+	100% { -moz-transform:rotate(-360deg); }
+}
+@-webkit-keyframes spinoff {
+	0% { -webkit-transform:rotate(0deg); }
+	100% { -webkit-transform:rotate(-360deg); }
+}
