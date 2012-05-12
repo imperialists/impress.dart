@@ -128,6 +128,9 @@ class Impress {
 
     // Scale and perspective
     mImpress.style.cssText = getState(mSteps[0]).scaleCSS();
+
+    // Go to the first step, unless an explicit step is requested in the href
+    goto(window.location.hash.isEmpty() ? 0 : Math.parseInt(window.location.hash.substring(1)));
   }
 
   /**
@@ -174,6 +177,8 @@ class Impress {
     }
     // Iterate over attributes of the step jumped to and apply CSS
     mCurrentStep = step;
+    // Due to a dartium bug we can't directly set window.location.hash
+    window.location.href = window.location.href.replaceFirst(new RegExp('#[0-9]*'), '') + '#${step}';
     mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS();
     // Scale and perspective
     mImpress.style.cssText = getState(mSteps[mCurrentStep]).scaleCSS();
@@ -191,6 +196,13 @@ class Impress {
 void main() {
 
   Impress pres = new Impress();
+
+  window.on.hashChange.add((e) {
+    int step = Math.parseInt(window.location.hash.substring(1));
+    if (step != pres.mCurrentStep)
+      pres.goto(step);
+  });
+
   pres.setupPresentation();
 
   bool serverControl = false;
@@ -233,11 +245,6 @@ void main() {
     });
 
   } // else serverControl
-
-
-  window.on.hashChange.add((e) {
-    pres.goto(Math.parseInt(window.location.hash.replaceFirst(new RegExp('^#\/?'), '')));
-  });
 
 
   /* not used atm
