@@ -111,6 +111,10 @@ class Impress {
     "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
 
   void setupPresentation() {
+    // Impress is supported
+    document.body.classes.remove('impress-not-supported');
+    document.body.classes.add('impress-supported');
+
     // Body and html
     document.body.style.cssText = bodyCSS();
 
