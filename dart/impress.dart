@@ -155,6 +155,29 @@ class Impress {
     });
   }
 
+  /**
+   * Generates a status bar a the bottom of a slide.
+   */
+  void generateBottomBar() {
+    Element bottomBar = new Element.tag('div');
+    bottomBar.id = 'bottombar';
+    bottomBar.style.position('fixed');
+    bottomBar.style.bottom('10px');
+    bottomBar.style.left('10px');
+    bottomBar.style.height('10px');
+    bottomBar.style.width('100%');
+    bottomBar.style.backgroundColor('#CCC');
+
+    Element presentBtn = new Element.tag('button');
+    presentBtn.id = 'present';
+    presentBtn.on.click.add((e) {
+      // Send a message using _socket
+    });
+
+    bottomBar.appendChild(presentBtn);
+    document.body.appendChild(bottomBar);
+  }
+
   State getState(Element step) =>
     new State(step.attributes, winScale(), mCfg);
 
@@ -234,6 +257,8 @@ void main() {
     pres.goto(Math.parseInt(window.location.hash.replaceFirst(new RegExp('^#\/?'), '')));
   });
 
+  // Generate a bottom bar on impress.dart presentations
+  pres.generateBottomBar();
 
   /* not used atm
 
