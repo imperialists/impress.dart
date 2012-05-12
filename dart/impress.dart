@@ -123,7 +123,7 @@ class Impress {
 
       // Switch slides
       if (msg['state'] is num) {
-        goto(msg['state']);
+        goto(msg['state'] - 1);
       }
 
       // Refresh
