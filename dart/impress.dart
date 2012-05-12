@@ -11,23 +11,24 @@ throttle(fn, int delay) {
   };
 }
 
-class impress {
+class Impress {
   Element goto(target, [duration=0]) {
     return null;
   }
-  
+
   Element prev() {
     return null;
   }
-  
+
   Element next() {
     return null;
   }
 }
 
 void main() {
-  impress api = new impress();
-  
+
+  Impress pres = new Impress();
+
   // prevent default keydown action when one of supported key is pressed
   document.on.keyDown.add((event) {
     if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40)) {
@@ -42,14 +43,14 @@ void main() {
         case 33: // pg up
         case 37: // left
         case 38: // up
-          api.prev();
+          pres.prev();
           break;
         case 9:  // tab
         case 32: // space
         case 34: // pg down
         case 39: // right
         case 40: // down
-          api.next();
+          pres.next();
           break;
       }
       event.preventDefault();
@@ -75,7 +76,7 @@ void main() {
       }
     }
 
-    if (api.goto(target) != null) {
+    if (pres.goto(target) != null) {
       event.stopImmediatePropagation();
       event.preventDefault();
     }
@@ -89,7 +90,7 @@ void main() {
             (target !== document.documentElement))) {
       target = target.parentNode;
     }
-    if (api.goto(target) != null) {
+    if (pres.goto(target) != null) {
       event.preventDefault();
     }
   });
@@ -102,9 +103,9 @@ void main() {
       var result = null;
 
       if (x < width) {
-        result = api.prev();
+        result = pres.prev();
       } else if (x > window.innerWidth - width) {
-        result = api.next();
+        result = pres.next();
       }
 
       if (result) {
@@ -116,6 +117,6 @@ void main() {
   // rescale presentation when window is resized
   window.on.resize.add(throttle((event) {
     // force going to active step again, to trigger rescaling
-    api.goto(document.query('.active'), 500);
+    pres.goto(document.query('.active'), 500);
   }, 250));
 }
