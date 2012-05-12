@@ -37,13 +37,13 @@ class State {
     this.canvasDelay = (zoomin ? 0 : cfg.transitionDuration/2);
   }
 
-  String toCSS() =>
+  String get toCSS() =>
     "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
 
-  String canvasCSS() =>
+  String get canvasCSS() =>
     "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${canvasDelay}ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
 
-  String scaleCSS() =>
+  String get scaleCSS() =>
     "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${rootDelay}ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${cfg.perspective / targetScale}) scale(${targetScale});";
 }
 
@@ -122,16 +122,16 @@ class Impress {
 
     // Create steps
     mSteps.forEach((Element step) {
-      step.style.cssText = stepCSS(getState(step).toCSS());
+      step.style.cssText = stepCSS(getState(step).toCSS);
       step.classes.add('future');
     });
 
     // Create Canvas
-    mCanvas.style.cssText = getState(mSteps[0]).canvasCSS();
+    mCanvas.style.cssText = getState(mSteps[0]).canvasCSS;
     mCanvas.elements.first.remove();
 
     // Scale and perspective
-    mImpress.style.cssText = getState(mSteps[0]).scaleCSS();
+    mImpress.style.cssText = getState(mSteps[0]).scaleCSS;
 
     // Go to the first step, unless an explicit step is requested in the href
     goto(window.location.hash.isEmpty() ? 0 : Math.parseInt(window.location.hash.substring(1)));
@@ -183,9 +183,9 @@ class Impress {
     mCurrentStep = step;
     // Due to a dartium bug we can't directly set window.location.hash
     window.location.href = window.location.href.replaceFirst(new RegExp('#[0-9]*'), '') + '#${step}';
-    mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS();
+    mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS;
     // Scale and perspective
-    mImpress.style.cssText = getState(mSteps[mCurrentStep]).scaleCSS();
+    mImpress.style.cssText = getState(mSteps[mCurrentStep]).scaleCSS;
   }
 
   void prev() {
