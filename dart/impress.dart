@@ -1,16 +1,5 @@
 #import('dart:html');
 
-/**
- * Throttling function calls
- */
-throttle(fn, int delay) {
-  int handle = 0;
-  return (args) {
-    window.clearTimeout(handle);
-    handle = window.setTimeout(() => fn(args), delay);
-  };
-}
-
 class Vector {
   num x = 0, y = 0, z = 0;
 }
@@ -33,7 +22,7 @@ class Config {
   
   num getAttribute(Element root, String a, num def) =>
       (root.attributes[a] == null) ?
-        def : Math.parseDouble(root.attributes[a]);
+        def : Math.parseDouble(root.dataset[a]);
   
   Config(Element root)
   {
@@ -71,12 +60,10 @@ class Impress {
   num winScale()
   {
     num hScale = document.window.innerHeight / mCfg.height;
-    num scale = document.window.innerWidth / mCfg.width;
-    if (hScale < scale) scale = hScale;
-    
-    if (mCfg.maxScale != null && scale > mCfg.maxScale) scale = mCfg.maxScale;
-    if (mCfg.minScale != null && scale < mCfg.minScale) scale = mCfg.minScale;
-    
+    num wScale = document.window.innerWidth / mCfg.width;
+    num scale = Math.min(hScale,wScale);
+    scale = Math.min(mCfg.maxScale,scale);
+    scale = Math.max(mCfg.minScale,scale);
     return scale;
   }
   
@@ -91,9 +78,10 @@ class Impress {
 
   String scaleCSS(State state)
   {
-      num windowScale = winScale() / state.scale;
-      num perspective = mCfg.perspective / windowScale;
-      return "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${windowScale});";
+      num windowScale = winScale();
+      num targetScale = windowScale / state.scale;
+      num perspective = mCfg.perspective / targetScale;
+      return "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${targetScale});";
   }
 
   void setupCanvas() {
@@ -151,13 +139,6 @@ void main() {
 
   Impress pres = new Impress();
   pres.setupCanvas();
-
-  // prevent default keydown action when one of supported key is pressed
-  document.on.keyDown.add((event) {
-    if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40)) {
-      event.preventDefault();
-    }
-  });
 
   // trigger impress action (next or prev) on keyup
   document.on.keyUp.add((event) {
@@ -263,3 +244,15 @@ void main() {
   }, 250));
  
 }
+
+/**
+ * Throttling function calls
+ */
+throttle(fn, int delay) {
+  int handle = 0;
+  return (args) {
+    window.clearTimeout(handle);
+    handle = window.setTimeout(() => fn(args), delay);
+  };
+}
+
