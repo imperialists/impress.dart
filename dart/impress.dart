@@ -105,7 +105,7 @@ class Impress {
     mCanvas.style.cssText = canvasCSS(getState(mSteps[0]));
     mCanvas.elements.first.innerHTML = "";
 
-    // Scale
+    // Scale and perspective
     mImpress.style.cssText = scaleCSS(getState(mSteps[0]));
   }
 
@@ -129,12 +129,11 @@ class Impress {
 
   void goto(int step) {
     // Iterate over attributes of the step jumped to and apply CSS
-    /*mSteps[step].attributes.forEach((k,v) {
-      ;
-    });*/
     mCurrentStep = step;
     print(canvasCSS(getState(mSteps[mCurrentStep])));
     mCanvas.style.cssText = canvasCSS(getState(mSteps[mCurrentStep]));
+    // Scale and perspective
+    mImpress.style.cssText = scaleCSS(getState(mSteps[mCurrentStep]));
   }
 
   void prev() {
@@ -249,11 +248,11 @@ void main() {
       }
     }
   });
-
+*/
   // rescale presentation when window is resized
   window.on.resize.add(throttle((event) {
     // force going to active step again, to trigger rescaling
-    pres.goto(document.query('.active'), 500);
+    pres.goto(pres.mCurrentStep);
   }, 250));
-  */
+ 
 }
