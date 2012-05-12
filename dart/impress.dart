@@ -8,12 +8,42 @@ class Vector {
 class State {
   Vector rot;
   Vector pos;
-  num scale = 1;
+  num scale;
+  num targetScale;
+  num perspective;
+  bool zoomin;
 
-  State() : rot = new Vector(), pos = new Vector();
+  State(attributes, winScale, perspective) :
+      rot = new Vector(),
+      pos = new Vector() {
+    num getAttribute(String a, [num def = 0]) =>
+      (attributes[a] == null) ?
+        def : Math.parseDouble(attributes[a]);
+
+    scale = getAttribute('data-scale', 1);
+    pos.x = getAttribute('data-x');
+    pos.y = getAttribute('data-y');
+    pos.z = getAttribute('data-z');
+    rot.x = getAttribute('data-rotate-x');
+    rot.y = getAttribute('data-rotate-y');
+    // Treat data-rotate as data-rotate-z:
+    // Allows using only data-rotate for pure 2D rotation
+    rot.z = getAttribute('data-rotate-z', getAttribute('data-rotate'));
+    this.targetScale = winScale / scale;
+    this.perspective = perspective / targetScale;
+    this.zoomin = targetScale >= scale;
+  }
 
   String toCSS() =>
       "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
+
+  String canvasCSS() =>
+      "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 0ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
+
+  String scaleCSS() {
+      var t="position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${targetScale});";
+      return t;
+  }
 }
 
 class Config {
@@ -24,18 +54,18 @@ class Config {
   num perspective;
   num transitionDuration;
 
-  num getAttribute(Element root, String a, num def) =>
-      (root.attributes[a] == null) ?
-        def : Math.parseDouble(root.dataset[a]);
-
   Config(Element root)
   {
-    height = getAttribute(root,"height",768);
-    width = getAttribute(root,"width",1024);
-    maxScale = getAttribute(root,"maxScale",1);
-    minScale = getAttribute(root,"minScale",0);
-    perspective = getAttribute(root,"perspective",1000);
-    transitionDuration = getAttribute(root,"transitionDuration",1000);
+    num getAttribute(String a, num def) =>
+        (root.attributes[a] == null) ?
+          def : Math.parseDouble(root.dataset[a]);
+
+    height = getAttribute("height",768);
+    width = getAttribute("width",1024);
+    maxScale = getAttribute("maxScale",1);
+    minScale = getAttribute("minScale",0);
+    perspective = getAttribute("perspective",1000);
+    transitionDuration = getAttribute("transitionDuration",1000);
   }
 }
 
@@ -79,16 +109,6 @@ class Impress {
   String stepCSS(String s) =>
     "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
 
-  String canvasCSS(State state) =>
-      "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 0ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-state.rot.z}deg) rotateY(${-state.rot.y}deg) rotateX(${-state.rot.x}deg) translate3d(${-state.pos.x}px, ${-state.pos.y}px, ${-state.pos.z}px);";
-
-  String scaleCSS(State state) {
-      num windowScale = winScale();
-      num targetScale = windowScale / state.scale;
-      num perspective = mCfg.perspective / targetScale;
-      return "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${targetScale});";
-  }
-
   void setupPresentation() {
     // Body and html
     document.body.style.cssText = bodyCSS();
@@ -101,11 +121,11 @@ class Impress {
     );
 
     // Create Canvas
-    mCanvas.style.cssText = canvasCSS(getState(mSteps[0]));
+    mCanvas.style.cssText = getState(mSteps[0]).canvasCSS();
     mCanvas.elements.first.remove();
 
     // Scale and perspective
-    mImpress.style.cssText = scaleCSS(getState(mSteps[0]));
+    mImpress.style.cssText = getState(mSteps[0]).scaleCSS();
   }
 
   /**
@@ -133,34 +153,15 @@ class Impress {
     });
   }
 
-
-  num getAttribute(Element step, String a, num def) =>
-    (step.attributes[a] == null) ?
-      def : Math.parseDouble(step.attributes[a]);
-
-  State getState(Element step) {
-    // We know we want a number, so we can "statically cast"
-    num attr(String a, [num def = 0]) => getAttribute(step, a, def);
-    State s = new State();
-    s.scale = attr('data-scale', 1);
-    s.pos.x = attr('data-x');
-    s.pos.y = attr('data-y');
-    s.pos.z = attr('data-z');
-    s.rot.x = attr('data-rotate-x');
-    s.rot.y = attr('data-rotate-y');
-    // Treat data-rotate as data-rotate-z:
-    // Allows using only data-rotate for pure 2D rotation
-    s.rot.z = attr('data-rotate-z', attr('data-rotate'));
-    return s;
-  }
+  State getState(Element step) =>
+    new State(step.attributes, winScale(), mCfg.perspective);
 
   void goto(int step) {
     // Iterate over attributes of the step jumped to and apply CSS
     mCurrentStep = step;
-    print(canvasCSS(getState(mSteps[mCurrentStep])));
-    mCanvas.style.cssText = canvasCSS(getState(mSteps[mCurrentStep]));
+    mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS();
     // Scale and perspective
-    mImpress.style.cssText = scaleCSS(getState(mSteps[mCurrentStep]));
+    mImpress.style.cssText = getState(mSteps[mCurrentStep]).scaleCSS();
   }
 
   void prev() {
@@ -180,7 +181,7 @@ void main() {
   pres.setupPresentation();
 
   bool serverControl = false;
-  
+
   if (serverControl) {
 
     pres.connectServer();
