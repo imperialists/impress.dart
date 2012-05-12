@@ -8,14 +8,16 @@ class Vector {
 class State {
   Vector rot;
   Vector pos;
+  Config cfg;
   num scale;
   num targetScale;
-  num perspective;
-  bool zoomin;
+  num rootDelay;
+  num canvasDelay;
 
-  State(attributes, winScale, perspective) :
+  State(attributes, winScale, cfg) :
       rot = new Vector(),
-      pos = new Vector() {
+      pos = new Vector(),
+      cfg = cfg {
     num getAttribute(String a, [num def = 0]) =>
       (attributes[a] == null) ?
         def : Math.parseDouble(attributes[a]);
@@ -30,18 +32,19 @@ class State {
     // Allows using only data-rotate for pure 2D rotation
     rot.z = getAttribute('data-rotate-z', getAttribute('data-rotate'));
     this.targetScale = winScale / scale;
-    this.perspective = perspective / targetScale;
-    this.zoomin = targetScale >= scale;
+    bool zoomin = targetScale >= scale;
+    this.rootDelay = (zoomin ? cfg.transitionDuration/2 : 0);
+    this.canvasDelay = (zoomin ? 0 : cfg.transitionDuration/2);
   }
 
   String toCSS() =>
       "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
 
   String canvasCSS() =>
-      "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 0ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
+      "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${canvasDelay}ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
 
   String scaleCSS() {
-      var t="position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${targetScale});";
+      var t="position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${rootDelay}ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${cfg.perspective / targetScale}) scale(${targetScale});";
       return t;
   }
 }
@@ -154,7 +157,7 @@ class Impress {
   }
 
   State getState(Element step) =>
-    new State(step.attributes, winScale(), mCfg.perspective);
+    new State(step.attributes, winScale(), mCfg);
 
   void goto(int step) {
     // Iterate over attributes of the step jumped to and apply CSS
