@@ -67,6 +67,9 @@ class Impress {
     return scale;
   }
   
+  String bodyCSS() =>
+    "height: 100%; overflow-x: hidden; overflow-y: hidden;";
+  
   String stepCSS(String s) =>
     "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
 
@@ -76,22 +79,27 @@ class Impress {
   String canvasCSS(State state) =>
       "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 0ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-state.rot.z}deg) rotateY(${-state.rot.y}deg) rotateX(${-state.rot.x}deg) translate3d(${-state.pos.x}px, ${-state.pos.y}px, ${-state.pos.z}px);";
 
-  String scaleCSS(State state)
-  {
+  String scaleCSS(State state) {
       num windowScale = winScale();
       num targetScale = windowScale / state.scale;
       num perspective = mCfg.perspective / targetScale;
       return "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 250ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${perspective}) scale(${targetScale});";
   }
 
-  void setupCanvas() {
+  void setupPresentation() {
+    // Body and html
+    document.body.style.cssText = bodyCSS();
+    
+    document.head.innerHTML = document.head.innerHTML + '<meta content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" name="viewport">';
+    
     // Create steps
     mSteps.forEach((Element step) =>
       step.style.cssText = stepCSS(stateToCSS(getState(step)))
     );
+    
     // Create Canvas
     mCanvas.style.cssText = canvasCSS(getState(mSteps[0]));
-    mCanvas.elements.first.innerHTML = "";
+    mCanvas.elements.first.remove();
 
     // Scale and perspective
     mImpress.style.cssText = scaleCSS(getState(mSteps[0]));
@@ -138,7 +146,7 @@ class Impress {
 void main() {
 
   Impress pres = new Impress();
-  pres.setupCanvas();
+  pres.setupPresentation();
 
   // trigger impress action (next or prev) on keyup
   document.on.keyUp.add((event) {
