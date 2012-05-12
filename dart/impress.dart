@@ -175,13 +175,11 @@ class Impress {
   }
 
   void prev() {
-    int prev_ = mCurrentStep - 1;
-    goto(prev_ >= 0 ? prev_ : mSteps.length-1);
+    goto((mCurrentStep - 1) % mSteps.length);
   }
 
   void next() {
-    int next_ = mCurrentStep + 1;
-    goto(next_ < mSteps.length ? next_ : 0);
+    goto((mCurrentStep + 1) % mSteps.length);
   }
 }
 
