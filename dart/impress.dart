@@ -1,4 +1,5 @@
 #import('dart:html');
+#import('dart:json');
 
 class Vector {
   num x = 0, y = 0, z = 0;
@@ -46,6 +47,8 @@ class Impress {
   int mCurrentStep;
 
   Config mCfg;
+
+  WebSocket _socket;
 
   Impress()
   {
@@ -105,6 +108,32 @@ class Impress {
     mImpress.style.cssText = scaleCSS(getState(mSteps[0]));
   }
 
+  /**
+   * Setup a connection to the presentation server
+   * and start listening for commands.
+   */
+  void connectServer() {
+    final Location location = window.location;
+    String url = 'ws://${location.host}/ws';
+    _socket = new WebSocket(url);
+
+    // Handle command from server
+    _socket.on.message.add((e) {
+      Map msg = JSON.parse(e.data);
+
+      // Switch slides
+      if (msg['state'] is num) {
+        goto(msg['state']);
+      }
+
+      // Refresh
+      if (msg['refresh']) {
+        window.location.reload();
+      }
+    });
+  }
+
+
   num getAttribute(Element step, String a, num def) =>
     (step.attributes[a] == null) ?
       def : Math.parseDouble(step.attributes[a]);
@@ -150,42 +179,46 @@ void main() {
   Impress pres = new Impress();
   pres.setupPresentation();
 
-  // trigger impress action (next or prev) on keyup
-  document.on.keyUp.add((event) {
-    switch (event.keyCode) {
-      case 33: // pg up
-        pres.prev();
-        break;
-      case 37: // left
-        pres.prev();
-        break;
-      case 38: // up
-        pres.prev();
-        break;
-      case 9:  // tab
-        pres.next();
-        break;
-      case 32: // space
-        pres.next();
-        break;
-      case 34: // pg down
-        pres.next();
-        break;
-      case 39: // right
-        pres.next();
-        break;
-      case 40: // down
-        pres.next();
-        break;
-    }
-    event.preventDefault();
-  });
+  bool serverControl = false;
+  
+  if (serverControl) {
 
-  window.on.hashChange.add((e) {
-    int slideNr = Math.parseInt(window.location.hash.replaceFirst(new RegExp('^#\/?'), ''));
-    print(slideNr);
-    pres.goto(slideNr);
-  });
+    pres.connectServer();
+
+  } else {
+
+    // trigger impress action (next or prev) on keyup
+    document.on.keyUp.add((event) {
+      switch (event.keyCode) {
+        case 33: // pg up
+          pres.prev();
+          break;
+        case 37: // left
+          pres.prev();
+          break;
+        case 38: // up
+          pres.prev();
+          break;
+        case 9:  // tab
+          pres.next();
+          break;
+        case 32: // space
+          pres.next();
+          break;
+        case 34: // pg down
+          pres.next();
+          break;
+        case 39: // right
+          pres.next();
+          break;
+        case 40: // down
+          pres.next();
+          break;
+      }
+      event.preventDefault();
+    });
+
+  } // else serverControl
 
 
   /* not used atm
