@@ -232,6 +232,11 @@ void main() {
   } // else serverControl
 
 
+  window.on.hashChange.add((e) {
+    pres.goto(Math.parseInt(window.location.hash.replaceFirst(new RegExp('^#\/?'), '')));
+  });
+
+
   /* not used atm
 
   // delegated handler for clicking on the links to presentation steps
