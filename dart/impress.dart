@@ -250,66 +250,6 @@ void main() {
 
   } // else serverControl
 
-
-  /* not used atm
-
-  // delegated handler for clicking on the links to presentation steps
-  document.on.click.add((event) {
-    // event delegation with "bubbling"
-    // check if event taget (or any of its parents is a link)
-    var target = event.target;
-    while ((target.tagName !== "A") &&
-           (target !== document.documentElement)) {
-      target = target.parentNode;
-    }
-
-    if (target.tagName === "A") {
-      var href = target.getAttribute("href");
-
-      // if it's a link to presentation step, target this step
-      if (href && href[0] === "#") {
-        target = document.query(href.slice(1));
-      }
-    }
-
-    if (pres.goto(target) != null) {
-      event.stopImmediatePropagation();
-      event.preventDefault();
-    }
-  });
-
-  // delegated handler for clicking on step elements
-  document.on.click.add((event) {
-    var target = event.target;
-    // find closest step element that is not active
-    while (!(target.classes.contains("step") && !target.classes.contains("active") &&
-            (target !== document.documentElement))) {
-      target = target.parentNode;
-    }
-    if (pres.goto(target) != null) {
-      event.preventDefault();
-    }
-  });
-
-  // touch handler to detect taps on the left and right side of the screen
-  document.on.touchStart.add((event) {
-    if (event.touches.length === 1) {
-      var x = event.touches[0].clientX;
-      var width = window.innerWidth * 0.3;
-      var result = null;
-
-      if (x < width) {
-        result = pres.prev();
-      } else if (x > window.innerWidth - width) {
-        result = pres.next();
-      }
-
-      if (result) {
-        event.preventDefault();
-      }
-    }
-  });
-*/
   // rescale presentation when window is resized
   window.on.resize.add(throttle((event) {
     // force going to active step again, to trigger rescaling
