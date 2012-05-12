@@ -19,11 +19,11 @@ class Config {
   num minScale;
   num perspective;
   num transitionDuration;
-  
+
   num getAttribute(Element root, String a, num def) =>
       (root.attributes[a] == null) ?
         def : Math.parseDouble(root.dataset[a]);
-  
+
   Config(Element root)
   {
     height = getAttribute(root,"height",768);
@@ -44,7 +44,7 @@ class Impress {
   ElementList mSteps;
   // Index of the currently active step
   int mCurrentStep;
-  
+
   Config mCfg;
 
   Impress()
@@ -66,10 +66,10 @@ class Impress {
     scale = Math.max(mCfg.minScale,scale);
     return scale;
   }
-  
+
   String bodyCSS() =>
     "height: 100%; overflow-x: hidden; overflow-y: hidden;";
-  
+
   String stepCSS(String s) =>
     "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
 
@@ -89,14 +89,14 @@ class Impress {
   void setupPresentation() {
     // Body and html
     document.body.style.cssText = bodyCSS();
-    
+
     document.head.innerHTML = document.head.innerHTML + '<meta content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" name="viewport">';
-    
+
     // Create steps
     mSteps.forEach((Element step) =>
       step.style.cssText = stepCSS(stateToCSS(getState(step)))
     );
-    
+
     // Create Canvas
     mCanvas.style.cssText = canvasCSS(getState(mSteps[0]));
     mCanvas.elements.first.remove();
@@ -119,7 +119,9 @@ class Impress {
     s.pos.z = attr('data-z');
     s.rot.x = attr('data-rotate-x');
     s.rot.y = attr('data-rotate-y');
-    s.rot.z = attr('data-rotate-z');
+    // Treat data-rotate as data-rotate-z:
+    // Allows using only data-rotate for pure 2D rotation
+    s.rot.z = attr('data-rotate-z', attr('data-rotate'));
     return s;
   }
 
@@ -250,7 +252,7 @@ void main() {
     // force going to active step again, to trigger rescaling
     pres.goto(pres.mCurrentStep);
   }, 250));
- 
+
 }
 
 /**
