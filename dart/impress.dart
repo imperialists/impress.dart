@@ -38,15 +38,13 @@ class State {
   }
 
   String toCSS() =>
-      "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
+    "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
 
   String canvasCSS() =>
-      "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${canvasDelay}ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
+    "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${canvasDelay}ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
 
-  String scaleCSS() {
-      var t="position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${rootDelay}ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${cfg.perspective / targetScale}) scale(${targetScale});";
-      return t;
-  }
+  String scaleCSS() =>
+    "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${rootDelay}ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${cfg.perspective / targetScale}) scale(${targetScale});";
 }
 
 class Config {
