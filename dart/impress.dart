@@ -119,7 +119,7 @@ class Impress {
     // Create steps
     mSteps.forEach((Element step) {
       step.style.cssText = stepCSS(getState(step).toCSS());
-      step.classes = ['step', 'future'];
+      step.classes.add('future');
     });
 
     // Create Canvas
@@ -160,13 +160,18 @@ class Impress {
 
   void goto(int step) {
     // Mark previous steps as passed
-    for (int s = mCurrentStep; s < step; s++)
-      mSteps[s].classes = ['step', 'past'];
+    for (int s = mCurrentStep; s < step; s++) {
+      mSteps[s].classes.removeAll(['active', 'future']);
+      mSteps[s].classes.add('past');
+    }
     // Mark current step active
-    mSteps[step].classes = ['step', 'active'];
+    mSteps[step].classes.removeAll(['past', 'future']);
+    mSteps[step].classes.add('active');
     // Mark subsequent steps as future
-    for (int s = mCurrentStep; s > step; s--)
-      mSteps[s].classes = ['step', 'future'];
+    for (int s = mCurrentStep; s > step; s--) {
+      mSteps[s].classes.removeAll(['past', 'active']);
+      mSteps[s].classes.add('future');
+    }
     // Iterate over attributes of the step jumped to and apply CSS
     mCurrentStep = step;
     mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS();
