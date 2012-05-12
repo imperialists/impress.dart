@@ -117,9 +117,10 @@ class Impress {
     document.head.innerHTML = document.head.innerHTML + '<meta content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" name="viewport">';
 
     // Create steps
-    mSteps.forEach((Element step) =>
-      step.style.cssText = stepCSS(getState(step).toCSS())
-    );
+    mSteps.forEach((Element step) {
+      step.style.cssText = stepCSS(getState(step).toCSS());
+      step.classes = ['step', 'future'];
+    });
 
     // Create Canvas
     mCanvas.style.cssText = getState(mSteps[0]).canvasCSS();
@@ -158,6 +159,14 @@ class Impress {
     new State(step.attributes, winScale(), mCfg);
 
   void goto(int step) {
+    // Mark previous steps as passed
+    for (int s = mCurrentStep; s < step; s++)
+      mSteps[s].classes = ['step', 'past'];
+    // Mark current step active
+    mSteps[step].classes = ['step', 'active'];
+    // Mark subsequent steps as future
+    for (int s = mCurrentStep; s > step; s--)
+      mSteps[s].classes = ['step', 'future'];
     // Iterate over attributes of the step jumped to and apply CSS
     mCurrentStep = step;
     mCanvas.style.cssText = getState(mSteps[mCurrentStep]).canvasCSS();
