@@ -64,7 +64,7 @@ class Impress {
     return s;
   }
 
-  void gotoStep(int step) {
+  void goto(int step) {
     // Iterate over attributes of the step jumped to and apply CSS
     mSteps[step].attributes.forEach((k,v) {
       ;
@@ -72,16 +72,14 @@ class Impress {
     mCurrentStep = step;
   }
 
-  Element goto(target, [duration=0]) {
-    return null;
+  void prev() {
+    int prev_ = mCurrentStep - 1;
+    goto(prev_ >= 0 ? prev_ : mSteps.length-1);
   }
 
-  Element prev() {
-    return null;
-  }
-
-  Element next() {
-    return null;
+  void next() {
+    int next_ = mCurrentStep + 1;
+    goto(next_ < mSteps.length ? next_ : 0);
   }
 }
 
@@ -99,24 +97,36 @@ void main() {
 
   // trigger impress action (next or prev) on keyup
   document.on.keyUp.add((event) {
-    if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34) || (event.keyCode >= 37 && event.keyCode <= 40)) {
-      switch (event.keyCode) {
-        case 33: // pg up
-        case 37: // left
-        case 38: // up
-          pres.prev();
-          break;
-        case 9:  // tab
-        case 32: // space
-        case 34: // pg down
-        case 39: // right
-        case 40: // down
-          pres.next();
-          break;
-      }
-      event.preventDefault();
+    switch (event.keyCode) {
+      case 33: // pg up
+        pres.prev();
+        break;
+      case 37: // left
+        pres.prev();
+        break;
+      case 38: // up
+        pres.prev();
+        break;
+      case 9:  // tab
+        pres.next();
+        break;
+      case 32: // space
+        pres.next();
+        break;
+      case 34: // pg down
+        pres.next();
+        break;
+      case 39: // right
+        pres.next();
+        break;
+      case 40: // down
+        pres.next();
+        break;
     }
+    event.preventDefault();
   });
+
+  /* not used atm
 
   // delegated handler for clicking on the links to presentation steps
   document.on.click.add((event) {
@@ -180,4 +190,5 @@ void main() {
     // force going to active step again, to trigger rescaling
     pres.goto(document.query('.active'), 500);
   }, 250));
+  */
 }
