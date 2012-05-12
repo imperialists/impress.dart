@@ -11,7 +11,67 @@ throttle(fn, int delay) {
   };
 }
 
+class Vector {
+  num x = 0, y = 0, z = 0;
+}
+
+class State {
+  Vector rot;
+  Vector pos;
+  num scale = 1;
+
+  State() : rot = new Vector(), pos = new Vector();
+}
+
 class Impress {
+
+  // List of all available steps
+  ElementList mSteps;
+  // Index of the currently active step
+  int mCurrentStep;
+
+  Impress() :
+    mSteps = document.query('#impress').queryAll('.step'),
+    mCurrentStep = 0;
+
+  String stepCSS(String s) =>
+    "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
+
+  String stateToCSS(State state) =>
+      "translate3d(${state.pos.x}px, ${state.pos.y}px, ${state.pos.z}px) rotateX(${state.rot.x}deg) rotateY(${state.rot.y}deg) rotateZ(${state.rot.z}deg) scale(${state.scale})";
+
+  void setupCanvas() {
+    mSteps.forEach((Element step) =>
+      step.style.cssText = stepCSS(stateToCSS(getState(step)))
+    );
+  }
+
+  num getAttribute(Element step, String a, num def) =>
+    (step.attributes[a] == null) ?
+      def : Math.parseDouble(step.attributes[a]);
+
+  State getState(Element step) {
+    // We know we want a number, so we can "statically cast"
+    num attr(String a, [num def = 0]) => getAttribute(step, a, def);
+    State s = new State();
+    s.scale = attr('data-scale', 1);
+    s.pos.x = attr('data-x');
+    s.pos.y = attr('data-y');
+    s.pos.z = attr('data-z');
+    s.rot.x = attr('data-rotate-x');
+    s.rot.y = attr('data-rotate-y');
+    s.rot.z = attr('data-rotate-z');
+    return s;
+  }
+
+  void gotoStep(int step) {
+    // Iterate over attributes of the step jumped to and apply CSS
+    mSteps[step].attributes.forEach((k,v) {
+      ;
+    });
+    mCurrentStep = step;
+  }
+
   Element goto(target, [duration=0]) {
     return null;
   }
@@ -28,6 +88,7 @@ class Impress {
 void main() {
 
   Impress pres = new Impress();
+  pres.setupCanvas();
 
   // prevent default keydown action when one of supported key is pressed
   document.on.keyDown.add((event) {
