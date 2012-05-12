@@ -11,6 +11,9 @@ class State {
   num scale = 1;
 
   State() : rot = new Vector(), pos = new Vector();
+
+  String toCSS() =>
+      "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
 }
 
 class Config {
@@ -76,9 +79,6 @@ class Impress {
   String stepCSS(String s) =>
     "position: absolute; -webkit-transform: translate(-50%, -50%) ${s}; -webkit-transform-style: preserve-3d;";
 
-  String stateToCSS(State state) =>
-      "translate3d(${state.pos.x}px, ${state.pos.y}px, ${state.pos.z}px) rotateX(${state.rot.x}deg) rotateY(${state.rot.y}deg) rotateZ(${state.rot.z}deg) scale(${state.scale})";
-
   String canvasCSS(State state) =>
       "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all 500ms ease-in-out 0ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-state.rot.z}deg) rotateY(${-state.rot.y}deg) rotateX(${-state.rot.x}deg) translate3d(${-state.pos.x}px, ${-state.pos.y}px, ${-state.pos.z}px);";
 
@@ -97,7 +97,7 @@ class Impress {
 
     // Create steps
     mSteps.forEach((Element step) =>
-      step.style.cssText = stepCSS(stateToCSS(getState(step)))
+      step.style.cssText = stepCSS(getState(step).toCSS())
     );
 
     // Create Canvas
