@@ -190,6 +190,13 @@ void main() {
     event.preventDefault();
   });
 
+  window.on.hashChange.add((e) {
+    int slideNr = Math.parseInt(window.location.hash.replaceFirst(new RegExp('^#\/?'), ''));
+    print(slideNr);
+    pres.goto(slideNr);
+  });
+
+
   /* not used atm
 
   // delegated handler for clicking on the links to presentation steps
