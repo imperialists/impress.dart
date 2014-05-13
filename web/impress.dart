@@ -139,31 +139,6 @@ class Impress {
     goto(window.location.hash.isEmpty ? 0 : int.parse(window.location.hash.substring(1)));
   }
 
-  /**
-   * Setup a connection to the presentation server
-   * and start listening for commands.
-   */
-  void connectServer() {
-    final Location location = window.location;
-    String url = 'ws://${location.host}/ws';
-    _socket = new WebSocket(url);
-
-    // Handle command from server
-    _socket.onMessage.listen((e) {
-      Map msg = JSON.decoder.convert(e.data);
-
-      // Switch slides
-      if (msg['state'] is num) {
-        goto((msg['state'] - 1) % (mSteps.length));
-      }
-
-      // Refresh
-      if (msg['refresh']) {
-        window.location.reload();
-      }
-    });
-  }
-
   State getState(Element step) =>
     new State(step.attributes, winScale(), mCfg);
 
@@ -210,47 +185,37 @@ void main() {
   });
 
   pres.setupPresentation();
-
-  bool serverControl = false;
-
-  if (serverControl) {
-
-    pres.connectServer();
-
-  } else {
-
-    // trigger impress action (next or prev) on keyup
-    document.onKeyUp.listen((event) {
-      switch (event.keyCode) {
-        case 33: // pg up
-          pres.prev();
-          break;
-        case 37: // left
-          pres.prev();
-          break;
-        case 38: // up
-          pres.prev();
-          break;
-        case 9:  // tab
-          pres.next();
-          break;
-        case 32: // space
-          pres.next();
-          break;
-        case 34: // pg down
-          pres.next();
-          break;
-        case 39: // right
-          pres.next();
-          break;
-        case 40: // down
-          pres.next();
-          break;
+  
+  // trigger impress action (next or prev) on keyup
+  document.onKeyUp.listen((event) {
+    switch (event.keyCode) {
+      case 33: // pg up
+        pres.prev();
+        break;
+      case 37: // left
+        pres.prev();
+        break;
+      case 38: // up
+        pres.prev();
+        break;
+      case 9:  // tab
+        pres.next();
+        break;
+      case 32: // space
+        pres.next();
+        break;
+      case 34: // pg down
+        pres.next();
+        break;
+      case 39: // right
+        pres.next();
+        break;
+      case 40: // down
+        pres.next();
+        break;
       }
       event.preventDefault();
     });
-
-  } // else serverControl
 
   // rescale presentation when window is resized
   window.onResize.listen((_){
