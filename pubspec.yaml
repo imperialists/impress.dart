@@ -1,0 +1,9 @@
+name: impress
+version: 0.9.0
+authors:
+- Florian Rathgeber and others
+- Tim Kluge
+description: impress.js port to dart
+homepage: https://github.com/gwTumm/impress.dart
+dependencies:
+  browser: any
