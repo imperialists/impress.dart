@@ -1,5 +1,7 @@
-#import('dart:html');
-#import('dart:json');
+import 'dart:html';
+import 'dart:convert';
+import 'dart:math';
+import 'dart:async';
 
 class Vector {
   num x = 0, y = 0, z = 0;
@@ -20,7 +22,7 @@ class State {
       cfg = cfg {
     num getAttribute(String a, [num def = 0]) =>
       (attributes[a] == null) ?
-        def : Math.parseDouble(attributes[a]);
+        def : double.parse(attributes[a]);
 
     scale = getAttribute('data-scale', 1);
     pos.x = getAttribute('data-x');
@@ -37,13 +39,13 @@ class State {
     this.canvasDelay = (zoomin ? 0 : cfg.transitionDuration/2);
   }
 
-  String get toCSS() =>
+  String get toCSS =>
     "translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateX(${rot.x}deg) rotateY(${rot.y}deg) rotateZ(${rot.z}deg) scale(${scale})";
 
-  String get canvasCSS() =>
+  String get canvasCSS =>
     "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${canvasDelay}ms; -webkit-transform-style: preserve-3d; -webkit-transform: rotateZ(${-rot.z}deg) rotateY(${-rot.y}deg) rotateX(${-rot.x}deg) translate3d(${-pos.x}px, ${-pos.y}px, ${-pos.z}px);";
 
-  String get scaleCSS() =>
+  String get scaleCSS =>
     "position: absolute; -webkit-transform-origin: 0% 0%; -webkit-transition: all ${cfg.transitionDuration}ms ease-in-out ${rootDelay}ms; -webkit-transform-style: preserve-3d; top: 50%; left: 50%; -webkit-transform: perspective(${cfg.perspective / targetScale}) scale(${targetScale});";
 }
 
@@ -59,7 +61,7 @@ class Config {
   {
     num getAttribute(String a, num def) =>
         (root.attributes[a] == null) ?
-          def : Math.parseDouble(root.dataset[a]);
+          def : double.parse(root.dataset[a]);
 
     height = getAttribute("height",768);
     width = getAttribute("width",1024);
@@ -87,7 +89,7 @@ class Impress {
   Impress()
   {
     mImpress = document.query('#impress');
-    mImpress.innerHTML = '<div id="canvas">'+ mImpress.innerHTML +'</div>';
+    mImpress.innerHtml = '<div id="canvas">'+ mImpress.innerHtml +'</div>';
     mCanvas = document.query('#canvas');
     mSteps = mCanvas.queryAll('.step');
     mCurrentStep = 0;
@@ -96,11 +98,11 @@ class Impress {
 
   num winScale()
   {
-    num hScale = document.window.innerHeight / mCfg.height;
-    num wScale = document.window.innerWidth / mCfg.width;
-    num scale = Math.min(hScale,wScale);
-    scale = Math.min(mCfg.maxScale,scale);
-    scale = Math.max(mCfg.minScale,scale);
+    num hScale = window.innerHeight / mCfg.height;
+    num wScale = window.innerWidth / mCfg.width;
+    num scale = min(hScale,wScale);
+    scale = min(mCfg.maxScale,scale);
+    scale = max(mCfg.minScale,scale);
     return scale;
   }
 
@@ -118,7 +120,7 @@ class Impress {
     // Body and html
     document.body.style.cssText = bodyCSS();
 
-    document.head.innerHTML = document.head.innerHTML + '<meta content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" name="viewport">';
+    document.head.innerHtml = document.head.innerHtml + '<meta content="width=device-width, minimum-scale=1, maximum-scale=1, user-scalable=no" name="viewport">';
 
     // Create steps
     mSteps.forEach((Element step) {
@@ -128,13 +130,13 @@ class Impress {
 
     // Create Canvas
     mCanvas.style.cssText = getState(mSteps[0]).canvasCSS;
-    mCanvas.elements.first.remove();
+    mCanvas.children.first.remove();
 
     // Scale and perspective
     mImpress.style.cssText = getState(mSteps[0]).scaleCSS;
 
     // Go to the first step, unless an explicit step is requested in the href
-    goto(window.location.hash.isEmpty() ? 0 : Math.parseInt(window.location.hash.substring(1)));
+    goto(window.location.hash.isEmpty ? 0 : int.parse(window.location.hash.substring(1)));
   }
 
   /**
@@ -147,8 +149,8 @@ class Impress {
     _socket = new WebSocket(url);
 
     // Handle command from server
-    _socket.on.message.add((e) {
-      Map msg = JSON.parse(e.data);
+    _socket.onMessage.listen((e) {
+      Map msg = JSON.decoder.convert(e.data);
 
       // Switch slides
       if (msg['state'] is num) {
@@ -201,8 +203,8 @@ void main() {
 
   Impress pres = new Impress();
 
-  window.on.hashChange.add((e) {
-    int step = Math.parseInt(window.location.hash.substring(1));
+  window.onHashChange.listen((e) {
+    int step = int.parse(window.location.hash.substring(1));
     if (step != pres.mCurrentStep)
       pres.goto(step);
   });
@@ -218,7 +220,7 @@ void main() {
   } else {
 
     // trigger impress action (next or prev) on keyup
-    document.on.keyUp.add((event) {
+    document.onKeyUp.listen((event) {
       switch (event.keyCode) {
         case 33: // pg up
           pres.prev();
@@ -251,21 +253,11 @@ void main() {
   } // else serverControl
 
   // rescale presentation when window is resized
-  window.on.resize.add(throttle((event) {
+  window.onResize.listen((_){
     // force going to active step again, to trigger rescaling
-    pres.goto(pres.mCurrentStep);
-  }, 250));
-
-}
-
-/**
- * Throttling function calls
- */
-throttle(fn, int delay) {
-  int handle = 0;
-  return (args) {
-    window.clearTimeout(handle);
-    handle = window.setTimeout(() => fn(args), delay);
-  };
+    return new Future.delayed(new Duration(milliseconds: 250)).then((_){
+      pres.goto(pres.mCurrentStep);
+    });
+  });
 }
 
