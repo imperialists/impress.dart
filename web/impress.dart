@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'dart:convert';
 import 'dart:math';
 import 'dart:async';
 
@@ -63,12 +62,12 @@ class Config {
         (root.attributes[a] == null) ?
           def : double.parse(root.dataset[a]);
 
-    height = getAttribute("height",768);
-    width = getAttribute("width",1024);
-    maxScale = getAttribute("maxScale",1);
-    minScale = getAttribute("minScale",0);
-    perspective = getAttribute("perspective",1000);
-    transitionDuration = getAttribute("transitionDuration",1000);
+    height = getAttribute("height", 768);
+    width = getAttribute("width", 1024);
+    maxScale = getAttribute("maxScale", 1);
+    minScale = getAttribute("minScale", 0);
+    perspective = getAttribute("perspective", 1000);
+    transitionDuration = getAttribute("transitionDuration", 1000);
   }
 }
 
@@ -88,10 +87,10 @@ class Impress {
 
   Impress()
   {
-    mImpress = document.query('#impress');
+    mImpress = document.querySelector('#impress');
     mImpress.innerHtml = '<div id="canvas">'+ mImpress.innerHtml +'</div>';
-    mCanvas = document.query('#canvas');
-    mSteps = mCanvas.queryAll('.step');
+    mCanvas = document.querySelector('#canvas');
+    mSteps = mCanvas.querySelectorAll('.step');
     mCurrentStep = 0;
     mCfg = new Config(mImpress);
   }
